@@ -1,3 +1,25 @@
+script.on_init(function()
+
+	global.Drills = {}
+
+	for _,surface in pairs(game.surfaces) do
+		for _,sentity in ipairs(surface.find_entities_filtered{type = "mining-drill"}) do 
+			posx = sentity.position.x 
+			posy = sentity.position.y
+			radius = sentity.prototype.mining_drill_radius
+			
+			count = 0
+
+			for key,value in ipairs(sentity.surface.find_entities_filtered{area = {{posx - radius, posy - radius}, {posx + radius, posy + radius}}, type = "resource"}) do 
+				count = count + value.amount
+			end
+		
+			table.insert(global.Drills, {entity = sentity, text = rendering.draw_text{text = 'w8 4 update', surface = sentity.surface, target = {sentity.position.x - 0.75, sentity.position.y}, color = {255, 255, 255}}, prevcount = count, prevtick = game.tick, shouldupdate = game.tick + 297})
+		end
+	end
+end)
+
+
 script.on_event(defines.events.on_tick, function()
 	if global.Drills ~= nil then
 		if #global.Drills > 0 then
@@ -67,7 +89,7 @@ end)
 
 script.on_event(defines.events.on_built_entity, function(event)
 
-	if (global.Drills == nil and event.created_entity.type == 'mining-drill') then
+	if (event.created_entity.type == 'mining-drill') then
 		global.Drills = {}
 		posx = event.created_entity.position.x 
 		posy = event.created_entity.position.y
@@ -78,22 +100,6 @@ script.on_event(defines.events.on_built_entity, function(event)
 			count = count + value.amount
 		end
 
-		global.Drills[1] = {entity = event.created_entity, text = rendering.draw_text{text = 'w8 4 update', surface = event.created_entity.surface, target = {event.created_entity.position.x - 0.75, event.created_entity.position.y}, color = {255, 255, 255}}, prevcount = count, prevtick = game.tick, shouldupdate = game.tick + 297}
-	else
-		if(event.created_entity ~= nil and event.created_entity.type == 'mining-drill') then
-			posx = event.created_entity.position.x 
-			posy = event.created_entity.position.y
-			radius = event.created_entity.prototype.mining_drill_radius
-		
-			count = 0
-			for key,value in ipairs(event.created_entity.surface.find_entities_filtered{area = {{posx - radius, posy - radius}, {posx + radius, posy + radius}}, type = "resource"}) do 
-				count = count + value.amount
-			end
-
-
-			global.Drills[#global.Drills + 1] = {entity = event.created_entity, text = rendering.draw_text{text = 'w8 4 update', surface = event.created_entity.surface, target = {event.created_entity.position.x - 0.75, event.created_entity.position.y}, color = {255, 255, 255}}, prevcount = count, prevtick = game.tick, shouldupdate = game.tick + 297}
-		end
+		table.insert(global.Drills, {entity = event.created_entity, text = rendering.draw_text{text = 'w8 4 update', surface = event.created_entity.surface, target = {event.created_entity.position.x - 0.75, event.created_entity.position.y}, color = {255, 255, 255}}, prevcount = count, prevtick = game.tick, shouldupdate = game.tick + 297})
 	end
-	
 end)
-
