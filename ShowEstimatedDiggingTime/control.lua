@@ -4,6 +4,11 @@ script.on_init(function()
 
 	for _,surface in pairs(game.surfaces) do
 		for _,sentity in ipairs(surface.find_entities_filtered{type = "mining-drill"}) do 
+
+			if sentity.name == "pumpjack" and not game.active_mods["steinios_unlasting_oil"] then
+				goto continue
+			end
+
 			posx = sentity.position.x 
 			posy = sentity.position.y
 			radius = sentity.prototype.mining_drill_radius
@@ -15,6 +20,8 @@ script.on_init(function()
 			end
 
 			table.insert(global.Drills, {entity = sentity, text = rendering.draw_text{text = '?', surface = sentity.surface, target = {sentity.position.x - 0.75, sentity.position.y}, color = {255, 255, 255}}, prevcount = count, prevtick = game.tick, shouldupdate = game.tick + math.random(55, 100)})
+			
+			::continue::
 		end
 	end
 end)
@@ -26,7 +33,7 @@ script.on_event(defines.events.on_tick, function()
 			for k, entity in pairs(global.Drills) do
 			  if entity.shouldupdate < game.tick then 
 					if (entity.entity ~= nil and entity.entity.valid) then
-                        if (entity.entity.status == 1) then
+                        			if (entity.entity.status == 1) then
 							posx = entity.entity.position.x 
 							posy = entity.entity.position.y
 							radius = entity.entity.prototype.mining_drill_radius
@@ -45,7 +52,7 @@ script.on_event(defines.events.on_tick, function()
 								estimatedticktime = estimatedticktime - hour * 3600
 
 								min = math.floor(estimatedticktime / 60)
-                        	    mins = tostring(min)
+                        	    				mins = tostring(min)
 
 								if min < 10 then
 									mins = '0' .. mins
@@ -54,7 +61,7 @@ script.on_event(defines.events.on_tick, function()
 								estimatedticktime = estimatedticktime - min * 60
 
 								sec = math.floor(estimatedticktime)
-                        	    secs = tostring(sec)
+                        	    				secs = tostring(sec)
 
 								if sec < 10 then
 									secs = '0' .. secs
@@ -62,17 +69,17 @@ script.on_event(defines.events.on_tick, function()
 
 								time = hour .. ':' .. mins .. ':' .. secs
 							
-                        	    rendering.set_color(entity.text, {255, 255, 255})
+                        	    				rendering.set_color(entity.text, {255, 255, 255})
 								rendering.set_text(entity.text, time)
 							end
 
 							entity.prevcount = count
 							entity.prevtick = game.tick
 							entity.shouldupdate = game.tick + math.random(55, 100)
-                		else
-                		    rendering.set_color(entity.text, {255, 0, 0})
-                		    rendering.set_text(entity.text, 'STOP')
-                		end
+                				else
+                		    		rendering.set_color(entity.text, {255, 0, 0})
+                		 	   	rendering.set_text(entity.text, 'STOP')
+                				end
 					else
 						rendering.destroy(global.Drills[k].text)
 						table.remove(global.Drills, k)
@@ -91,6 +98,11 @@ end)
 --on_built_entity
 
 function miningDrillNewEventHandler(event)
+
+	if event.created_entity.name == "pumpjack" and not game.active_mods["steinios_unlasting_oil"] then
+		return
+	end
+
 	posx = event.created_entity.position.x 
 	posy = event.created_entity.position.y
 	radius = event.created_entity.prototype.mining_drill_radius
